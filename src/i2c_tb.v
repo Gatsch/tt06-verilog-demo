@@ -11,6 +11,7 @@ module i2c_tb;
 	wire sda_o = 1'b0;
 	
 	i2c 
+		#(.ADDRESS(7'h4A))
 		i2c_dut (
 			.scl_i(scl_i),
 			.scl_o(scl_o),
@@ -50,8 +51,8 @@ module i2c_tb;
 		#40 sda_i = 1'b1;
 		#40 sda_i = 1'b0;
 		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b1;
 		#40 sda_i = 1'b0;
-		#40 $finish;
+		#40 sda_i = 1'b0; //1 read 0 write
+		#80 $finish;
 	end
 endmodule
