@@ -15,6 +15,7 @@ module i2c #(
 	reg last_scl = 1'b1;
 	wire scl_posedge = scl & ~last_scl;
 	wire scl_negedge = ~scl & last_scl;
+	reg scl_out = 1'b1;
 	
 	reg sda = 1'b1;
 	reg last_sda = 1'b1;
@@ -118,4 +119,5 @@ module i2c #(
 		endcase
     end
     assign sda_o = sda_out;
+    assign scl_o = scl_out;
 endmodule

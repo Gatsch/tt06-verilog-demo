@@ -1,6 +1,7 @@
 `default_nettype none
+`include "i2c.v"
 
-module tt_um_i2c #( parameter MAX_COUNT = 24'd10_000_000 ) (
+module tt_um_i2c (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
     input  wire [7:0] uio_in,   // IOs: Bidirectional Input path
@@ -13,16 +14,15 @@ module tt_um_i2c #( parameter MAX_COUNT = 24'd10_000_000 ) (
 
 	wire sda_o;
 	wire sda_i = uio_in[0];
-	assign uio_out[0] = 1'b0;
-	assign uio_oe[0] = ~sda_o;
-	
 	wire scl_o;
 	wire scl_i = uio_in[1];
-	assign uio_out[1] = 1'b0;
-	assign uio_oe[1] = ~scl_o;
+	assign uio_out = 8'b0;
+	assign uio_oe[7:2] = 6'b0;
+	assign uio_oe[1] = ~sda_o;
+	assign uio_oe[0] = ~scl_o;
+	assign uo_out = 8'b0;
 
     wire reset = ! rst_n;
-    
     
     
     i2c 
