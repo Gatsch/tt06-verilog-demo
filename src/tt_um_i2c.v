@@ -1,5 +1,4 @@
 `default_nettype none
-`include "i2c_led.v"
 
 module tt_um_i2c (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches

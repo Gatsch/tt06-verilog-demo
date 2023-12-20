@@ -1,6 +1,4 @@
 `default_nettype none
-`include "i2c.v"
-`include "led.v"
 
 module i2c_led #(
 	parameter ADDRESS = 7'h69,
