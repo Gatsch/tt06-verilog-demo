@@ -22,6 +22,10 @@ module tt_um_i2c (
 	assign uo_out = 8'b0;
 
     wire reset = ! rst_n;
+	wire [7:0] data;
+	wire data_valid;
+	wire start;
+	wire stop;
     
     
     i2c 
@@ -32,10 +36,13 @@ module tt_um_i2c (
 			.sda_i(sda_i),
 			.sda_o(sda_o),
 			.clk(clk),
-			.reset(reset)
+			.reset(reset),
+			.data(data),
+			.data_valid_o(data_valid),
+			.start(start),
+			.stop(stop)
 		);
     
-  
 
     
 
