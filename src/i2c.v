@@ -61,6 +61,10 @@ module i2c #(
     end
 	always @(state or start_signal or scl_posedge or scl_negedge) begin
 		if (start_signal) begin
+			data_cnt <= 4'b0000;
+			data_valid <= 1'b0;
+			sda_out <= 1'b1;
+			scl_out <= 1'b1;
 			next_state <= Address;
 		end else begin
 			case(state)

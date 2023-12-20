@@ -1,4 +1,5 @@
 `default_nettype none
+`include "i2c_led.v"
 
 module tt_um_i2c (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
@@ -11,38 +12,36 @@ module tt_um_i2c (
     input  wire       rst_n     // reset_n - low to reset
 );
 
+    wire reset = ! rst_n;
 	wire sda_o;
 	wire sda_i = uio_in[0];
 	wire scl_o;
 	wire scl_i = uio_in[1];
+	wire led_o;
 	assign uio_out = 8'b0;
 	assign uio_oe[7:2] = 6'b0;
 	assign uio_oe[1] = ~sda_o;
 	assign uio_oe[0] = ~scl_o;
-	assign uo_out = 8'b0;
+	assign uo_out[7:1] = 7'b0;
+	assign uo_out[0] = led_o;
 
-    wire reset = ! rst_n;
-	wire [7:0] data;
-	wire data_valid;
-	wire start;
-	wire stop;
     
     
-    i2c 
-		#()
-		i2c_dut (
+    i2c_led 
+		#(
+		.ADDRESS(7'h4A),
+		.LED_CNT(3)
+		)
+		i2c_led_dut (
 			.scl_i(scl_i),
 			.scl_o(scl_o),
 			.sda_i(sda_i),
 			.sda_o(sda_o),
+			.led_o(led_o),
 			.clk(clk),
-			.reset(reset),
-			.data(data),
-			.data_valid_o(data_valid),
-			.start(start),
-			.stop(stop)
+			.reset(reset)
 		);
-    
+   
 
     
 

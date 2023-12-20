@@ -1,5 +1,5 @@
 `timescale 1ns/1ns
-`include "i2c.v"
+`include "i2c_led.v"
 
 module i2c_tb;
 
@@ -9,24 +9,21 @@ module i2c_tb;
 	wire scl_o;
 	reg sda_i = 1'b0;
 	wire sda_o;
-	wire [7:0] data;
-	wire data_valid;
-	wire start;
-	wire stop;
+	wire led_o;
 	
-	i2c 
-		#(.ADDRESS(7'h4A))
-		i2c_dut (
+	i2c_led 
+		#(
+		.ADDRESS(7'h4A),
+		.LED_CNT(3)
+		)
+		i2c_led_dut (
 			.scl_i(scl_i),
 			.scl_o(scl_o),
 			.sda_i(sda_i),
 			.sda_o(sda_o),
+			.led_o(led_o),
 			.clk(clk_i),
-			.reset(rst_i),
-			.data(data),
-			.data_valid_o(data_valid),
-			.start(start),
-			.stop(stop)
+			.reset(rst_i)
 		);
 		
 	always #1 clk_i  = ~clk_i;
