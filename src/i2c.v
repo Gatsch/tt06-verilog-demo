@@ -50,10 +50,6 @@ module i2c #(
 	always @(posedge clk) begin
 		if (reset) begin
 			state <= Idle;
-			data_cnt <= 4'b0000;
-			data_valid <= 1'b0;
-			sda_out <= 1'b1;
-			scl_out <= 1'b1;
             
         end else begin
         	scl <= scl_i;
@@ -69,6 +65,10 @@ module i2c #(
 		end else begin
 			case(state)
 				Idle: begin
+					data_cnt <= 4'b0000;
+					data_valid <= 1'b0;
+					sda_out <= 1'b1;
+					scl_out <= 1'b1;
 					next_state <= Idle;
 				end
 				Address: begin
