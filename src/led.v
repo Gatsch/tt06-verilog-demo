@@ -20,11 +20,11 @@ module led #(
 	localparam DATAWIDTH = LED_CNT*CHANNELS*BITPERCHANNEL;
 	localparam DATACOUNTWIDTH = $clog2(DATAWIDTH);
 	
-	localparam REFRESH_PERIOD = $rtoi(CLK_SPEED*REFRESH_DURATION); 
+	localparam COUNTWIDTH = $clog2($rtoi(CLK_SPEED*REFRESH_DURATION));
+	localparam [COUNTWIDTH-1:0] REFRESH_PERIOD = $rtoi(CLK_SPEED*REFRESH_DURATION);
 	localparam COUNT_PERIOD = $rtoi(CLK_SPEED*PERIOD);
 	localparam COUNT_0H =  $rtoi(CLK_SPEED*HIGH0);
 	localparam COUNT_1H =  $rtoi(CLK_SPEED*HIGH1);
-	localparam COUNTWIDTH = $clog2(REFRESH_PERIOD);
 	
 	localparam Refresh = 1'b0;
 	localparam Write = 1'b1;
