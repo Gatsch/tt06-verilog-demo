@@ -85,25 +85,7 @@ module i2c_tb;
 		#40 sda_i = 1'b0;
 		
 		#40;
-		//NEW START
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#20 sda_i = 1'b0;
-		
-		//ADDRESS
-		#20 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		
-		#40;
-		//BYTE1
+		//BYTE3
 		#40 sda_i = 1'b1;
 		#40 sda_i = 1'b0;
 		#40 sda_i = 1'b1;
@@ -114,6 +96,6 @@ module i2c_tb;
 		#40 sda_i = 1'b0;
 		
 		
-		#80 $finish;
+		#200000 $finish;
 	end
 endmodule

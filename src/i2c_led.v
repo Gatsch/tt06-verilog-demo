@@ -2,6 +2,7 @@
 
 module i2c_led #(
 	parameter ADDRESS = 7'h69,
+	parameter CLK_SPEED = 25_000_000,
 	parameter LED_CNT = 3
 )(
 	input wire scl_i,
@@ -15,13 +16,21 @@ module i2c_led #(
 
 	
 	localparam DATAWIDTH = LED_CNT*3*8;
-
+	localparam DATACOUNTWIDTH = $clog2(DATAWIDTH);
 
 	wire [7:0] data;
 	wire data_valid;
 	wire start;
 	wire stop;
 	reg [DATAWIDTH-1:0]leddata;
+	
+	
+	localparam IDLE = 1'b0;
+	localparam WRITE = 1'b1;
+	reg state, next_state;
+	reg [DATACOUNTWIDTH:0]datacounter, next_datacounter;
+	integer i;
+	
 	
 	i2c 
 		#(.ADDRESS(ADDRESS))
@@ -39,13 +48,60 @@ module i2c_led #(
 		);
 
 
-led 
-		#(.LED_CNT(LED_CNT))
+	led 
+		#(
+		.CLK_SPEED(CLK_SPEED),
+		.LED_CNT(LED_CNT)
+		)
 		led_dut (
-			.data(data),
+			.data(leddata),
 			.led_o(led_o),
 			.clk(clk),
 			.reset(reset)
 		);
-
+		
+	
+	always @(posedge clk) begin
+		if (reset) begin
+			state <= 0;
+			datacounter <= 0;
+		end else begin
+			state <= next_state;
+			datacounter <= next_datacounter;
+		end
+		
+	end
+	
+	always @(state or start or data_valid) begin
+		next_state <= state;
+		next_datacounter <= datacounter;
+		
+		case (state) 
+			IDLE: begin
+				if (start) begin
+					next_datacounter <= {(DATACOUNTWIDTH){1'b0}};
+					next_state <= WRITE;
+				end else begin
+					next_state <= IDLE;
+				end
+			end
+			WRITE: begin
+				if (data_valid) begin
+					if (datacounter < DATACOUNTWIDTH) begin
+						for(i=0;i<8;i=i+1) begin
+							leddata[(datacounter<<3)+i] <= data[7-i];
+						end
+						next_datacounter <= datacounter + 1;
+						next_state <= WRITE;
+					end else begin
+						next_state <= IDLE;
+					end
+				end
+			end
+		endcase
+		
+		
+	end
+	
+	
 endmodule

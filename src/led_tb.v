@@ -24,7 +24,7 @@ module led_tb;
         data <= 24'b010011000101010111001001;
         rst_i <= 1'b1;
         #100; rst_i <= 1'b0;
-        #32000;
+        #200000;
         $finish;
     end
 endmodule
