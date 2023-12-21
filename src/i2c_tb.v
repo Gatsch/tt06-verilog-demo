@@ -116,7 +116,10 @@ module i2c_tb;
 		#40 sda_i = 1'b0;
 		#40 sda_i = 1'b0;
 		
+		#80;
+		#20 sda_i = 1'b1; //stop
+		#20 sda_i = 1'b0;
 		
-		#80 $finish;
+		#1000 $finish;
 	end
 endmodule
