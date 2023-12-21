@@ -20,11 +20,16 @@ module led #(
 	localparam DATAWIDTH = LED_CNT*CHANNELS*BITPERCHANNEL;
 	localparam DATACOUNTWIDTH = $clog2(DATAWIDTH);
 	
-	localparam COUNTWIDTH = $clog2($rtoi(CLK_SPEED*REFRESH_DURATION));
-	localparam [COUNTWIDTH-1:0] REFRESH_PERIOD = $rtoi(CLK_SPEED*REFRESH_DURATION);
-	localparam COUNT_PERIOD = $rtoi(CLK_SPEED*PERIOD);
-	localparam COUNT_0H =  $rtoi(CLK_SPEED*HIGH0);
-	localparam COUNT_1H =  $rtoi(CLK_SPEED*HIGH1);
+	localparam REFRESH_PERIOD32 = $rtoi(CLK_SPEED*REFRESH_DURATION);
+	localparam COUNT_PERIOD32 = $rtoi(CLK_SPEED*PERIOD);
+	localparam COUNT_0H32 =  $rtoi(CLK_SPEED*HIGH0);
+	localparam COUNT_1H32 =  $rtoi(CLK_SPEED*HIGH1);
+	
+	localparam COUNTWIDTH = $clog2(REFRESH_PERIOD32);
+	localparam REFRESH_PERIOD = REFRESH_PERIOD32[COUNTWIDTH-1:0];
+	localparam COUNT_PERIOD = COUNT_PERIOD32[COUNTWIDTH-1:0];
+	localparam COUNT_0H = COUNT_0H32[COUNTWIDTH-1:0];
+	localparam COUNT_1H = COUNT_1H32[COUNTWIDTH-1:0];
 	
 	localparam Refresh = 1'b0;
 	localparam Write = 1'b1;
@@ -62,11 +67,11 @@ module led #(
 				end
 			end
 			Write: begin
-				if (counter < COUNT_PERIOD-1) begin
+				if (counter < COUNT_PERIOD-1'b1) begin
 					next_counter <= counter + 1;
 				end else begin
 					next_counter <= 0;
-					if (datacounter < DATAWIDTH-1) begin
+					if (datacounter < DATAWIDTH-1'b1) begin
 						next_datacounter <= datacounter + 1;
 					end else begin
 						next_datacounter <= 0;

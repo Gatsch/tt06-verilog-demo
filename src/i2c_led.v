@@ -15,8 +15,9 @@ module i2c_led #(
 );
 
 	
-	localparam DATAWIDTH = LED_CNT*3*8;
-	localparam DATACOUNTWIDTH = $clog2(DATAWIDTH);
+	localparam DATAWIDTH32 = LED_CNT*3*8;
+	localparam DATACOUNTWIDTH = $clog2(DATAWIDTH32);
+	localparam DATAWIDTH = DATAWIDTH32[DATACOUNTWIDTH-1:0];
 
 	wire [7:0] data;
 	wire data_valid;
@@ -28,7 +29,7 @@ module i2c_led #(
 	localparam IDLE = 1'b0;
 	localparam WRITE = 1'b1;
 	reg state, next_state;
-	reg [DATACOUNTWIDTH:0]datacounter, next_datacounter;
+	reg [DATACOUNTWIDTH-1:0]datacounter, next_datacounter;
 	integer i;
 	
 	
@@ -72,7 +73,7 @@ module i2c_led #(
 		
 	end
 	
-	always @(state or start or data_valid) begin
+	always @(state, start, stop, data_valid) begin
 		next_state <= state;
 		next_datacounter <= datacounter;
 		
@@ -87,15 +88,17 @@ module i2c_led #(
 			end
 			WRITE: begin
 				if (data_valid) begin
-					if (datacounter < DATACOUNTWIDTH) begin
+					if (datacounter < DATAWIDTH) begin
 						for(i=0;i<8;i=i+1) begin
-							leddata[(datacounter<<3)+i] <= data[7-i];
+							leddata[(datacounter<<3)+i[DATACOUNTWIDTH-1:0]] <= data[7-i];
 						end
 						next_datacounter <= datacounter + 1;
 						next_state <= WRITE;
 					end else begin
 						next_state <= IDLE;
 					end
+				end else if (stop) begin
+					next_state <= IDLE;
 				end
 			end
 		endcase

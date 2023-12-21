@@ -14,6 +14,9 @@ module i2c_tb;
 	wire start;
 	wire stop;
 	
+	localparam I2CCYCLE = 10000;
+	localparam I2CHALFCYCLE = I2CCYCLE/2;
+	
 	i2c 
 		#(.ADDRESS(7'h4A))
 		i2c_dut (
@@ -29,97 +32,87 @@ module i2c_tb;
 			.stop(stop)
 		);
 		
-	always #1 clk_i  = ~clk_i;
+	always #20 clk_i  = ~clk_i;
 	
-	always #20 scl_i = ~scl_i;
+	always #I2CHALFCYCLE scl_i = ~scl_i;
 	
 	initial begin 
 		$dumpfile("tb.vcd");
 		$dumpvars;
-		/*
-		#15 scl_i = 1'b1;
-		#25 scl_i = 1'b0;
-		#15 sda_i = 1'b1;
-		#25 sda_i = 1'b0;
+		#50 rst_i = 1'b1;
+		#50 rst_i = 1'b0;
 		
-		#35 scl_i = 1'b1;
-		#45 sda_i = 1'b1;
-		#55 sda_i = 1'b0;
-		#60 $finish;
-		*/
-		#2 rst_i = 1'b1;
-		#2 rst_i = 1'b0;
-		
-		#6 sda_i = 1'b1;
-		#20 sda_i = 1'b0; //start
+		#2400 sda_i = 1'b1;
+		#I2CHALFCYCLE sda_i = 1'b0; //start
 		
 		//20 high 40 low 60 high 80 low
 		
 		//ADDRESS
-		#20 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0; //1 read 0 write
+		#I2CHALFCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0; //1 read 0 write
 		
-		#40;
+		#I2CCYCLE;
 		//BYTE 1
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
 		
-		#40;
+		#I2CCYCLE;
 		//BYTE 2
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
 		
-		#40;
+		#I2CCYCLE;
 		//NEW START
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#20 sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CHALFCYCLE sda_i = 1'b0;
 		
 		//ADDRESS
-		#20 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
+		#I2CHALFCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
 		
-		#40;
+		#I2CCYCLE;
 		//BYTE1
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b1;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
-		#40 sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b1;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
+		#I2CCYCLE sda_i = 1'b0;
 		
-		#80;
-		#20 sda_i = 1'b1; //stop
-		#20 sda_i = 1'b0;
+		#I2CCYCLE;
+		#I2CCYCLE;
+		#I2CHALFCYCLE sda_i = 1'b1; //stop
+		#I2CHALFCYCLE sda_i = 1'b0;
 		
-		#1000 $finish;
+		#4000 $finish;
 	end
 endmodule
