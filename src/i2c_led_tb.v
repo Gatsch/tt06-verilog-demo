@@ -1,7 +1,7 @@
 `timescale 1ns/1ns
 `include "i2c_led.v"
 
-module i2c_tb;
+module i2c_led_tb;
 
 	reg rst_i = 1'b0;
 	reg clk_i = 1'b0;
@@ -10,9 +10,13 @@ module i2c_tb;
 	reg sda_i = 1'b0;
 	wire sda_o;
 	wire led_o;
+	integer i;
+	reg [7:0] data;
 	
 	localparam I2CCYCLE = 10000;
 	localparam I2CHALFCYCLE = I2CCYCLE/2;
+	localparam I2C2CYCLE = I2CCYCLE/2;
+	localparam I2C4CYCLE = I2CCYCLE/4;
 	
 	i2c_led 
 		#(
@@ -31,7 +35,39 @@ module i2c_tb;
 		
 	always #20 clk_i  = ~clk_i;
 	
-	always #I2CHALFCYCLE scl_i = ~scl_i;
+	//always #I2CHALFCYCLE scl_i = ~scl_i;
+	
+	task start();
+		begin
+			scl_i = 1'b1;
+			sda_i = 1'b1;
+			#I2C4CYCLE sda_i = 1'b0;
+			#I2C4CYCLE scl_i = 1'b0;
+		end
+	endtask
+	
+	task i2cwrite(input [7:0] i2cdata);
+		begin
+			scl_i = 1'b0;
+			for(i=0;i<8;i=i+1)begin
+				#I2C4CYCLE sda_i = i2cdata[7-i];
+				#I2C4CYCLE scl_i = 1'b1;
+				#I2C2CYCLE scl_i = 1'b0;
+			end
+			#I2C4CYCLE;
+			#I2C2CYCLE scl_i = 1'b1;
+			#I2C2CYCLE scl_i = 1'b0;
+		end
+	endtask
+	
+	task stop();
+		begin
+			scl_i = 1'b1;
+			sda_i = 1'b0;
+			#I2C4CYCLE sda_i = 1'b1;
+			#I2C4CYCLE scl_i = 1'b0;
+		end
+	endtask
 	
 	initial begin 
 		$dumpfile("tb.vcd");
@@ -41,56 +77,17 @@ module i2c_tb;
 		#50 rst_i = 1'b1;
 		#50 rst_i = 1'b0;
 		
-		#2400 sda_i = 1'b1;
-		#I2CHALFCYCLE sda_i = 1'b0; //start
-		
-		//ADDRESS
-		#I2CHALFCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0; //1 read 0 write
-		
+		start();
 		#I2CCYCLE;
-		//BYTE 1
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b1;
 		
+		i2cwrite({7'h4A,1'b0});
 		#I2CCYCLE;
-		//BYTE 2
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b1;
-		
+		i2cwrite(8'hAB);
 		#I2CCYCLE;
-		//BYTE 3
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b1;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0;
-		#I2CCYCLE sda_i = 1'b0;
-		
+		i2cwrite(8'h36);
 		#I2CCYCLE;
-		#I2CCYCLE;
-		#I2CHALFCYCLE sda_i = 1'b1; //stop
-		#I2CHALFCYCLE sda_i = 1'b0;
+		i2cwrite(8'h84);
+		stop();
 		
 		#200000 $finish;
 	end

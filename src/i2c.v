@@ -1,4 +1,6 @@
 `default_nettype none
+`ifndef __i2c__
+`define __i2c__
 
 module i2c #(
 	parameter ADDRESS = 7'h69
@@ -151,3 +153,4 @@ module i2c #(
     assign start = start_signal;
     assign stop = stop_signal;
 endmodule
+`endif

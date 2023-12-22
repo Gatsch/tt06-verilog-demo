@@ -1,4 +1,7 @@
 `default_nettype none
+`ifndef __tt__um__i2c__
+`define __tt__um__i2c__
+`include "i2c_led.v"
 
 module tt_um_i2c (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
@@ -13,18 +16,24 @@ module tt_um_i2c (
 
     wire reset = ! rst_n;
 	wire sda_o;
-	wire sda_i = uio_in[0];
+	wire sda_i = uio_in[1];
 	wire scl_o;
-	wire scl_i = uio_in[1];
+	wire scl_i = uio_in[0];
 	wire led_o;
 	assign uio_out = 8'b0;
 	assign uio_oe[7:2] = 6'b0;
 	assign uio_oe[1] = ~sda_o;
 	assign uio_oe[0] = ~scl_o;
-	assign uo_out[7:1] = 7'b0;
-	assign uo_out[0] = led_o;
+	assign uo_out[7:3] = 7'b0;
+	assign uo_out[2] = led_o;
+	assign uo_out[1] = ~sda_o;
+	assign uo_out[0] = ~scl_o;
 
-    
+    /* verilator lint_off UNUSEDSIGNAL */
+    wire dummy0 = ena;
+    wire dummy1 = |ui_in[7:0];
+    wire dummy2 = |uio_in[7:2];
+    /* verilator lint_on UNUSEDSIGNAL */
     
     i2c_led 
 		#(
@@ -40,10 +49,7 @@ module tt_um_i2c (
 			.clk(clk),
 			.reset(reset)
 		);
-   
-
-    
-
-    // instantiate segment display
 
 endmodule
+
+`endif

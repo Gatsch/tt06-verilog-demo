@@ -1,4 +1,6 @@
 `default_nettype none
+`ifndef __led__
+`define __led__
 
 module led #(
 	parameter CLK_SPEED = 25_000_000,
@@ -88,3 +90,5 @@ module led #(
 	end
 	assign led_o = led_out;
 endmodule
+
+`endif

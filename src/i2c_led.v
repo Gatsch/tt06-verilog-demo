@@ -1,4 +1,8 @@
 `default_nettype none
+`ifndef __i2c_led__
+`define __i2c_led__
+`include "i2c.v"
+`include "led.v"
 
 module i2c_led #(
 	parameter ADDRESS = 7'h69,
@@ -108,3 +112,5 @@ module i2c_led #(
 	
 	
 endmodule
+
+`endif
