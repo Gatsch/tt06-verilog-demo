@@ -38,7 +38,7 @@ module tt_um_i2c_ws2812b (
     i2c_led 
 		#(
 		.ADDRESS(7'h4A),
-		.LED_CNT(10)
+		.LED_CNT(11)
 		)
 		i2c_led_dut (
 			.scl_i(scl_i),
