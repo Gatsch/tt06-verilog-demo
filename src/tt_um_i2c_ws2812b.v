@@ -3,7 +3,7 @@
 `define __tt__um__i2c__
 `include "i2c_led.v"
 
-module tt_um_i2c (
+module tt_um_i2c_ws2812b (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
     input  wire [7:0] uio_in,   // IOs: Bidirectional Input path
@@ -24,7 +24,7 @@ module tt_um_i2c (
 	assign uio_oe[7:2] = 6'b0;
 	assign uio_oe[1] = ~sda_o;
 	assign uio_oe[0] = ~scl_o;
-	assign uo_out[7:3] = 7'b0;
+	assign uo_out[7:3] = 5'b0;
 	assign uo_out[2] = led_o;
 	assign uo_out[1] = ~sda_o;
 	assign uo_out[0] = ~scl_o;
