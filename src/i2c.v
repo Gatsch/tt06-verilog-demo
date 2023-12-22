@@ -37,19 +37,17 @@ module i2c #(
 	reg read;
 	
 	
-	localparam Size = 3;
-	localparam Idle = 3'd0;
-	localparam Address = 3'd1;
-	localparam ReadOrWrite = 3'd2;
-	localparam PrepAck = 3'd3;
-	localparam Ack = 3'd4;
-	localparam Write = 3'd5;
-	reg [Size-1:0]state;
-	reg [Size-1:0]next_state;
+	localparam IDLE = 3'd0;
+	localparam READADDRESS = 3'd1;
+	localparam READORWRITE = 3'd2;
+	localparam PREPACK = 3'd3;
+	localparam ACK = 3'd4;
+	localparam WRITE = 3'd5;
+	reg [2:0]state, next_state;
 
 	always @(posedge clk) begin
 		if (reset) begin
-			state <= Idle;
+			state <= IDLE;
             
         end else begin
         	scl <= scl_i;
@@ -59,88 +57,89 @@ module i2c #(
     		state <= next_state;
         end
     end
+    
 	always @(state, start_signal, stop_signal, scl_posedge, scl_negedge) begin
 		if (start_signal) begin
 			data_cnt <= 4'b0000;
 			data_valid <= 1'b0;
 			sda_out <= 1'b1;
 			scl_out <= 1'b1;
-			next_state <= Address;
+			next_state <= READADDRESS;
 		end else if (stop_signal) begin
-			next_state <= Idle;
+			next_state <= IDLE;
 		end else begin
 			case(state)
-				Idle: begin
+				IDLE: begin
 					data_cnt <= 4'b0000;
 					data_valid <= 1'b0;
 					sda_out <= 1'b1;
 					scl_out <= 1'b1;
-					next_state <= Idle;
+					next_state <= IDLE;
 				end
-				Address: begin
+				READADDRESS: begin
 					if (data_cnt < Data_size-1) begin
 						if (scl_posedge) begin
 							data <= data<<1;
 							data[0] <= sda;
 							data_cnt <= data_cnt + 4'b0001;
 						end
-						next_state <= Address;
+						next_state <= READADDRESS;
 					end else begin
-						next_state <= ReadOrWrite;
+						next_state <= READORWRITE;
 					end
 				end
-				ReadOrWrite: begin
+				READORWRITE: begin
 					if (scl_posedge) begin
 						read <= sda;
 						data[Data_size-1] <= 0;
 						if (data[Data_size-2:0] == ADDRESS) begin
 							data_cnt <= 4'b0;
-							next_state <= PrepAck;
+							next_state <= PREPACK;
 						end else begin
-							next_state <= Idle;
+							next_state <= IDLE;
 						end
 					end else begin
-						next_state <= ReadOrWrite;
+						next_state <= READORWRITE;
 					end
 				end
-				PrepAck: begin
+				PREPACK: begin
 						if (scl_negedge) begin
 							sda_out <= 1'b0;
 							data_valid <= 1'b0;
-							next_state <= Ack;
+							next_state <= ACK;
 						end else begin
-							next_state <= PrepAck;
+							next_state <= PREPACK;
 						end
 					
 				end
-				Ack: begin
+				ACK: begin
 					if (scl_negedge) begin
 						sda_out <= 1'b1;
 						data_cnt <= 4'b0;
 						if (read) begin
-							next_state <= Idle;
+							next_state <= IDLE;
 						end else begin
-							next_state <= Write;
+							next_state <= WRITE;
 						end
 					end else begin
-						next_state <= Ack;
+						next_state <= ACK;
 					end
 				end
-				Write: begin
+				WRITE: begin
 					if (data_cnt < Data_size) begin
 						if (scl_posedge) begin
 							data <= data<<1;
 							data[0] <= sda;
 							data_cnt <= data_cnt + 4'b0001;
 						end
-						next_state <= Write;
+						next_state <= WRITE;
 					end else begin
 						data_valid <= 1'b1;		//TODO: STROBE??
-						next_state <= PrepAck;
+						next_state <= PREPACK;
 					end
 				end
 				default:
-		    		next_state <= Idle;
+		    		next_state <= IDLE;
 			endcase
 		end
     	

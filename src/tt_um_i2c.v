@@ -29,7 +29,7 @@ module tt_um_i2c (
     i2c_led 
 		#(
 		.ADDRESS(7'h4A),
-		.LED_CNT(8)
+		.LED_CNT(12)
 		)
 		i2c_led_dut (
 			.scl_i(scl_i),
